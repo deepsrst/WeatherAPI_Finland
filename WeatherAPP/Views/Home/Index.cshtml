@@ -1,0 +1,144 @@
+﻿
+@{
+
+    var temp = ViewData["Temperature"];
+}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather APP</title>
+    @* <link href="global.css" rel="stylesheet" /> *@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="~/css/global.css" rel="stylesheet" />
+    <script src="~/js/jquery-3.7.1.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div  class="search">
+            <input type="text" id="txtSearch" class="search_input" placeholder="Search City" name="city">
+            <button type="button" id="btnSubmit" class="button"><i class="fa fa-search"></i></button>
+        </div>
+        <div class="result-box">
+          
+
+        </div>
+        <!--content of the #app will load via javascript template strings-->
+        <main id="app">
+
+
+          <div class="container" id="containner">
+            <div class="datetime"><span id="time"></span></div>
+            <h1 class="city"> <span id="combineLocation"></span></h1>
+            <div class="weather-detail">
+
+                    <span class="temp"><span id="temperature"></span></span>
+            </div>
+            <div class="weather-desc">
+                @* <div class="main-weather">${response.weather[0].main}</div> *@
+                    <p>Feels like <span id="feellike"></span></p>
+            </div>
+            <ul class="weather-info">
+                @* <li><span class="min">Min: ${Math.round(response.main.temp_min)}°C to Max: ${Math.round(response.main.temp_max)} °C</span></li> *@
+                <li class="windspeed">Windspeed : <span id="windspeed"></span></li>
+    @*             <li class="humidity">Humidity : ${response.main.humidity}%</li>
+                <li class="visibility">Visibility : ${Math.round(response.visibility / 1000)} km</li> *@
+            </ul>
+        </div>
+
+
+            <div style="width: 100%; display: flex; flex-direction: row">
+                <p style="color: red"><span id="error"></span><p>
+            </div>
+
+            <div class="loader" id="loader"></div>
+        </main>
+    </div>
+
+    
+@*     <script src="main.js" type="text/javascript"></script> *@
+</body>
+
+</html>
+
+     <script>
+    $(document).ready(function () {     
+         
+       /// GetWeather("");
+        $("#loader").hide();
+        $("#containner").hide();
+        $("#error").html("Enter the location");
+
+        $('#txtSearch').keypress(function (e) {
+            if (e.which === 13) {   //keycode of enter is 13
+                var location = $("#txtSearch").val();
+                GetWeather(location);
+            }
+        });
+    });
+
+  
+      $("#btnSubmit").click(function () {
+        var location = $("#txtSearch").val();
+        GetWeather(location);
+         });
+
+
+
+
+
+         //method to get api data and show response data in the UI
+         function GetWeather(locationParam) 
+         {
+             debugger;
+        $("#error").html("");
+        if ((locationParam == null || locationParam.trim() == ""))
+        {
+            $("#error").html("Enter the location");
+            $("#containner").hide();
+            $("#loader").hide();
+            return false;
+        
+        }
+
+
+        var location = locationParam;
+             $("#containner").hide();
+             $("#loader").show();
+
+             $.ajax({
+             type:"POST",
+            url: "/Home/GetWeather",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(location),
+             success: function (result) {
+                 debugger;
+                $("#temperature").html(result.returnTemp);
+                $("#windspeed").html(result.returnWindSpeed);
+                $("#combineLocation").html(result.returnCombineLocation);
+                $("#error").html(result.returnError);
+                $("#feellike").html(result.returnFeelLike);
+                $("#containner").show();
+                $("#loader").hide();
+                 },
+
+                 error: function (error) {    
+                     debugger;
+                $("#temperature").html(error.returnTemp);
+                $("#windspeed").html(error.returnWindSpeed);
+                $("#combineLocation").html(error.returnCombineLocation);
+                 $("#error").html(error.returnError);
+                $("#feellike").html(error.returnFeelLike);
+                $("#containner").show();
+                $("#loader").hide();
+                 }
+        });
+       
+         }
+
+       
+</script>
+ @* <script src="~/js/main.js"></script>  *@
